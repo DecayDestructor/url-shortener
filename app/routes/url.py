@@ -13,13 +13,18 @@ from app.core.redis import redis_client
 from app.core.rate_limit import rate_limiter
 from app.tasks.click_sync import sync_clicks_to_db
 from app.schemas.url import AdminURLStatsResponse
+from app.core.shortcode import base62_encode
 
 router = APIRouter()
 
 
-def generate_short_code(length: int = 6):
-    chars = string.ascii_letters + string.digits
-    return ''.join(random.choice(chars) for _ in range(length))
+def generate_short_code() -> str:
+    """
+    Redis-backed global counter → Base62 encoded short code
+    """
+    counter = redis_client.incr("global:url:id")
+    return base62_encode(counter)
+
 
 
 @router.post(
@@ -44,15 +49,7 @@ def shorten_url(
 
     short_code = generate_short_code()
 
-    existing = session.exec(
-        select(URL).where(URL.short_code == short_code)
-    ).first()
 
-    while existing:
-        short_code = generate_short_code()
-        existing = session.exec(
-            select(URL).where(URL.short_code == short_code)
-        ).first()
 
     url = URL(
         short_code=short_code,
@@ -69,6 +66,8 @@ def shorten_url(
 
 
 
+
+
 @router.get("/stats/{short_code}", response_model = URLStatsResponse)
 def get_url_stats(
     short_code: str,
@@ -81,21 +80,15 @@ def get_url_stats(
         raise HTTPException(status_code = 404, detail="Short URL not found")
     
     redis_clicks = redis_client.get(f"clicks:{short_code}")
-    total_clicks = int(redis_clicks) if redis_clicks else 0
+    redis_clicks = int(redis_clicks) if redis_clicks else 0
 
-    #Merge Redis clicks into DB
-    if total_clicks > 0:
-        url.clicks += total_clicks
-        session.add(url)
-        session.commit()
-        redis_client.delete(f"clicks:{short_code}")
 
     return URLStatsResponse(
-        short_code = url.short_code,
-        original_url= url.original_url,
-        clicks = url.clicks,
-        created_at= url.created_at
-    )
+    short_code=url.short_code,
+    original_url=url.original_url,
+    clicks=url.clicks + redis_clicks,
+    created_at=url.created_at
+)
     
     
 
@@ -122,8 +115,8 @@ def redirect_to_original(
 
         if redis_client.ttl("trending_urls") == -1:
             redis_client.expire("trending_urls", 86400)
-
-        background_tasks.add_task(sync_clicks_to_db, short_code)
+        if count % 50 == 0:
+            background_tasks.add_task(sync_clicks_to_db, short_code)
 
         return RedirectResponse(url=cached_url, status_code=302)
 

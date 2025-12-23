@@ -7,7 +7,7 @@ from app.core.redis import redis_client
 def sync_clicks_to_db(short_code: str):
     redis_key = f"clicks:{short_code}"
 
-    clicks = redis_client.get(redis_key)
+    clicks = redis_client.getdel(redis_key)
     clicks = int(clicks) if clicks else 0
 
     if clicks == 0:
@@ -20,7 +20,6 @@ def sync_clicks_to_db(short_code: str):
 
         if url:
             url.clicks += clicks
-            session.add(url)
             session.commit()
 
-            #redis_client.delete(redis_key)
+    
