@@ -1,4 +1,4 @@
-# URL Shortener with Caching, Analytics & Trending URLs
+# URL Shortener with Caching, Rate Limiting & Real-Time Analytics
 
  Hello! I built this small URL shortener project using FastAPI, Redis, and PostgreSQL (Neon), with a minimal Streamlit frontend.
 It focuses on basic system design, scalability, caching strategies, and real-time analytics.
