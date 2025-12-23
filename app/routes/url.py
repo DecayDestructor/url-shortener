@@ -12,6 +12,7 @@ from app.schemas.url import URLStatsResponse
 from app.core.redis import redis_client
 from app.core.rate_limit import rate_limiter
 from app.tasks.click_sync import sync_clicks_to_db
+from app.schemas.url import AdminURLStatsResponse
 
 router = APIRouter()
 
@@ -83,12 +84,10 @@ def get_url_stats(
     total_clicks = int(redis_clicks) if redis_clicks else 0
 
     #Merge Redis clicks into DB
-    if redis_clicks > 0:
-        url.clicks += redis_clicks
+    if total_clicks > 0:
+        url.clicks += total_clicks
         session.add(url)
         session.commit()
-
-        #Clear Redis counter
         redis_client.delete(f"clicks:{short_code}")
 
     return URLStatsResponse(
@@ -100,26 +99,35 @@ def get_url_stats(
     
     
 
-
 @router.get("/{short_code}")
 def redirect_to_original(
     short_code: str,
     background_tasks: BackgroundTasks,
     session: Session = Depends(get_session)
 ):
-    # Check Redis cache for URL
-    cached_url = redis_client.get(f"url:{short_code}")
+    print("REDIRECT HIT:", short_code)
+    cache_key = f"url:{short_code}"
+    click_key = f"clicks:{short_code}"
+
+    cached_url = redis_client.get(cache_key)
 
     if cached_url:
-        # Increment clicks in Redis (FAST)
-        redis_client.incr(f"clicks:{short_code}")
+        # Increment click counter
+        count = redis_client.incr(click_key)
+        if count == 1:
+            redis_client.expire(click_key, 86400)
 
-        # Increment clicks in DB (SLOW)
+        # Trending 
+        redis_client.zincrby("trending_urls", 1, short_code)
+
+        if redis_client.ttl("trending_urls") == -1:
+            redis_client.expire("trending_urls", 86400)
+
         background_tasks.add_task(sync_clicks_to_db, short_code)
 
         return RedirectResponse(url=cached_url, status_code=302)
 
-    # Cache miss → check DB
+    # Cache miss → DB
     url = session.exec(
         select(URL).where(URL.short_code == short_code)
     ).first()
@@ -127,20 +135,71 @@ def redirect_to_original(
     if not url:
         raise HTTPException(status_code=404, detail="Short URL not found")
 
-    # Save URL in Redis
-    redis_client.setex(
-        f"url:{short_code}",
-        3600,  # 1 hour
-        url.original_url
-    )
+    # Cache URL
+    redis_client.setex(cache_key, 3600, url.original_url)
 
-    # Initialize click counter
-    redis_client.incr(f"clicks:{short_code}")
+    # Init click count
+    redis_client.incr(click_key)
+    redis_client.expire(click_key, 86400)
+
+    # Trending
+    redis_client.zincrby("trending_urls", 1, short_code)
+    redis_client.expire("trending_urls", 86400)
+
     background_tasks.add_task(sync_clicks_to_db, short_code)
 
-    return RedirectResponse(
-        url=url.original_url,
-        status_code=302
+    return RedirectResponse(url=url.original_url, status_code=302)
+
+
+@router.get("/admin/urls", response_model=AdminURLStatsResponse)
+def get_all_urls_stats(session: Session = Depends(get_session), top: int = None):
+    urls = session.exec(select(URL)).all()
+    result = []
+
+    for url in urls:
+        # Get Redis pending clicks
+        redis_clicks = redis_client.get(f"clicks:{url.short_code}")
+        redis_clicks = int(redis_clicks) if redis_clicks else 0
+
+        total_clicks = url.clicks + redis_clicks
+
+        result.append({
+            "short_code": url.short_code,
+            "original_url": url.original_url,
+            "clicks": total_clicks,
+            "created_at": url.created_at
+        })
+
+    # Sort by clicks if top N requested
+    if top:
+        result.sort(key=lambda x: x["clicks"], reverse=True)
+        result = result[:top]
+
+    return {"urls": result}
+
+
+
+@router.get("/admin/trending", response_model=AdminURLStatsResponse)
+def get_trending_urls(session: Session = Depends(get_session), top: int = 5):
+    trending = redis_client.zrevrange(
+        "trending_urls",
+        0,
+        top - 1,
+        withscores=True
     )
 
+    result = []
+    for short_code, score in trending:
+        url = session.exec(
+            select(URL).where(URL.short_code == short_code)
+        ).first()
 
+        if url:
+            result.append({
+                "short_code": url.short_code,
+                "original_url": url.original_url,
+                "clicks": int(score),
+                "created_at": url.created_at
+            })
+
+    return {"urls": result}

@@ -1,14 +1,15 @@
-from fastapi import Request, HTTPException, Depends
+from fastapi import Request, HTTPException
+from redis.exceptions import RedisError
 from app.core.redis import redis_client
 
-RATE_LIMIT = 5 #requests
-WINDOW_SECONDS = 60 #per minute
+RATE_LIMIT = 5
+WINDOW_SECONDS = 60
 
 def rate_limiter(request: Request):
-    try:
-        client_ip = request.client.host
-        key = f"rate_limit:{client_ip}"
+    client_ip = request.client.host
+    key = f"rate_limit:{client_ip}"
 
+    try:
         current_count = redis_client.incr(key)
 
         if current_count == 1:
@@ -20,6 +21,10 @@ def rate_limiter(request: Request):
                 detail="Too many requests. Please try again later."
             )
 
-    except Exception:
-        # Redis down → allow request
-        pass
+    except HTTPException:
+        # IMPORTANT: re-raise it
+        raise
+
+    except RedisError:
+        # Redis down → fail open
+        return

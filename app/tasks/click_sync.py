@@ -23,4 +23,4 @@ def sync_clicks_to_db(short_code: str):
             session.add(url)
             session.commit()
 
-            redis_client.delete(redis_key)
+            #redis_client.delete(redis_key)
