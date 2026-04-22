@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --yellow: #FFE500;
+  --black: #0a0a0a;
+  --white: #FFFEF0;
+  --cream: #F5F0DC;
+  --coral: #FF4040;
+  --blue: #1a6bff;
+  --green: #00C853;
+  --border: 2.5px solid #0a0a0a;
+  --shadow: 4px 4px 0px #0a0a0a;
+  --shadow-lg: 6px 6px 0px #0a0a0a;
+  --shadow-xl: 8px 8px 0px #0a0a0a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono-brutal { font-family: 'Space Mono', monospace; }
+
+/* Neo-brutal card */
+.brutal-card {
+  border: var(--border);
+  box-shadow: var(--shadow);
+  background: var(--white);
+}
+
+.brutal-card-lg {
+  border: var(--border);
+  box-shadow: var(--shadow-lg);
+  background: var(--white);
+}
+
+/* Buttons */
+.btn-brutal {
+  border: var(--border);
+  box-shadow: var(--shadow);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #0a0a0a;
+}
+
+.btn-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #0a0a0a;
+}
+
+/* Input */
+.input-brutal {
+  border: var(--border);
+  background: var(--white);
+  color: var(--black);
+  outline: none;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: box-shadow 0.1s ease;
+}
+
+.input-brutal:focus {
+  box-shadow: 4px 4px 0px var(--yellow);
+}
+
+/* Tag / badge */
+.tag-brutal {
+  border: 2px solid var(--black);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 8px;
+  display: inline-block;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--black); border-radius: 0; }
