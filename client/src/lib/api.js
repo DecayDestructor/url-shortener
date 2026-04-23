@@ -1,4 +1,7 @@
-const API = "http://localhost:8000";
+// Local dev:  VITE_API_URL is unset → hits http://localhost:8000 directly.
+// Docker:     VITE_API_URL=/api is baked in at build time (Dockerfile ARG).
+//             Nginx proxies /api/* → backend, stripping the /api prefix.
+const API = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 export async function apiPost(path, body, token = null) {
   const headers = { "Content-Type": "application/json" };
