@@ -45,16 +45,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Build allowed origins: local dev + Docker (port 80) + any BASE_URL set via env
-_base_url = os.getenv("BASE_URL", "")
+# Build allowed origins: local dev + Docker (port 80) + any BASE_URL set via env/config
+from app.core.config import BASE_URL
+
+_env_base_url = os.getenv("BASE_URL", "")
 _allowed_origins = [
     "http://localhost:5173",   # Vite dev server
     "http://localhost:3000",   # Alt dev port
     "http://localhost",        # Docker / Nginx on port 80
     "http://localhost:80",
 ]
-if _base_url and _base_url not in _allowed_origins:
-    _allowed_origins.append(_base_url)
+if _env_base_url and _env_base_url not in _allowed_origins:
+    _allowed_origins.append(_env_base_url)
+if BASE_URL and BASE_URL not in _allowed_origins:
+    _allowed_origins.append(BASE_URL)
 
 app.add_middleware(
     CORSMiddleware,
