@@ -19,9 +19,10 @@ pipeline {
                 // Keeping it simple, no virtualenv.
                 // Note: --break-system-packages is used for newer Debian versions 
                 // in the Jenkins LTS image to allow system-wide pip installs.
+                // --ignore-installed prevents pip from trying to uninstall apt-managed packages (like pytest)
                 sh '''
                 echo "Installing Python dependencies..."
-                pip3 install --break-system-packages -r requirements.txt || pip3 install -r requirements.txt
+                pip3 install --break-system-packages --ignore-installed -r requirements.txt
                 '''
             }
         }
