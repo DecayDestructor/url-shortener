@@ -30,10 +30,13 @@ pipeline {
         stage('Run Tests') {
             steps {
                 // Run tests with verbose output
-                // Create a dummy .env file so pydantic-settings doesn't fail on missing DATABASE_URL
+                // Create a dummy .env file configured for SQLite so FastAPI lifespan events don't fail trying to connect to a fake Postgres host
                 sh '''
                 echo "Creating dummy .env for tests..."
-                cp .env.example .env
+                echo "DATABASE_URL=sqlite://" > .env
+                echo "REDIS_URL=redis://localhost:6379" >> .env
+                echo "BASE_URL=http://localhost:8000" >> .env
+                echo "JWT_SECRET_KEY=test-secret" >> .env
                 echo "Running unit tests..."
                 pytest -v
                 '''
