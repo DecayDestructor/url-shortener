@@ -45,12 +45,15 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                // Builds the frontend and backend images defined in docker-compose.yml
+                // Builds the frontend and backend images
                 sh '''
                 echo "Building all Docker images (Frontend & Backend)..."
                 
-                # Build everything defined in docker-compose.yml
-                docker compose build
+                # Build Backend
+                docker build -t url-shortener-backend:${IMAGE_TAG} -t url-shortener-backend:latest -f Dockerfile.backend .
+                
+                # Build Frontend
+                docker build --build-arg VITE_API_URL=/api -t url-shortener-frontend:${IMAGE_TAG} -t url-shortener-frontend:latest -f Dockerfile.frontend .
                 '''
             }
         }
