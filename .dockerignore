@@ -23,7 +23,7 @@ client/node_modules/
 client/dist/
 client/.cache/
 
-# Environment files (use .env in compose, not in image)
+# Environment files 
 .env
 .env.*
 !.env.example
@@ -38,7 +38,7 @@ client/.cache/
 .DS_Store
 Thumbs.db
 
-# Docs & tests (not needed in image)
+# Docs & tests 
 README.md
 tests/
 

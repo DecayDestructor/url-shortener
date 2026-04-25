@@ -1,6 +1,4 @@
-"""
-test_rate_limit.py — Tests for Redis-backed rate limiting on POST /shorten.
-
+"""test_rate_limit.py — Tests for Redis-backed rate limiting on POST /shorten.
 Rate limit: 5 requests per 60-second window per IP.
 Exceeding returns HTTP 429.
 """
@@ -25,9 +23,7 @@ class TestRateLimiting:
         assert resp.status_code != 429
 
     def test_fifth_request_still_succeeds(self, client: TestClient, user_token: str):
-        """
-        Send exactly 5 requests — all should pass (limit is >5).
-        We mock the rate limiter counter to return controlled values.
+        """Send exactly 5 requests — all should pass (limit is >5). We mock the rate limiter counter to return controlled values.
         """
         counter = {"val": 0}
 
@@ -46,8 +42,7 @@ class TestRateLimiting:
                 assert resp.status_code != 429, f"Request {i+1} was rate-limited unexpectedly"
 
     def test_sixth_request_returns_429(self, client: TestClient, user_token: str):
-        """
-        Simulate a counter already at 6 (over the limit of 5).
+        """ Simulate a counter already at 6 (over the limit of 5).
         """
         with patch("app.core.rate_limit.redis_client") as mock_rl:
             mock_rl.incr.return_value = 6  # already over limit
@@ -71,8 +66,7 @@ class TestRateLimiting:
 
     def test_redis_error_fails_open(self, client: TestClient, user_token: str):
         """
-        If Redis is unreachable, rate limiting should fail open
-        (i.e., NOT block the request — the route should still succeed).
+        If Redis is unreachable, rate limiting should fail open (i.e., NOT block the request — the route should still succeed).
         """
         with patch("app.core.rate_limit.redis_client") as mock_rl:
             mock_rl.incr.side_effect = RedisError("connection refused")

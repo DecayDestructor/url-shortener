@@ -1,8 +1,5 @@
-"""
-test_analytics.py — Tests for GET /analytics/{short_code} endpoint.
-
-Verifies: click counts, device breakdown, referrer tracking,
-          recent click activity, and access control.
+""" test_analytics.py — Tests for GET /analytics/{short_code} endpoint.
+Verifies: click counts, device breakdown, referrer tracking, recent click activity, and access control.
 """
 
 import pytest

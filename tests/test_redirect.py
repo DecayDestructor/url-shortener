@@ -1,5 +1,4 @@
-"""
-test_redirect.py — Tests for GET /{short_code} (redirect endpoint).
+""" test_redirect.py — Tests for GET /{short_code} (redirect endpoint).
 """
 
 import pytest

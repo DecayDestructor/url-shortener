@@ -1,5 +1,4 @@
-"""
-conftest.py — shared fixtures for the snip.ly test suite.
+""" conftest.py — shared fixtures for the snip.ly test suite.
 All external dependencies (Redis, PostgreSQL) are fully mocked.
 No real network connections are made during tests.
 """

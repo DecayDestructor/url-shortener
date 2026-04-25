@@ -1,5 +1,4 @@
-"""
-test_auth.py — Tests for /auth/* endpoints (register, login, admin login, /me).
+""" test_auth.py — Tests for /auth/* endpoints (register, login, admin login, /me).
 """
 
 import pytest

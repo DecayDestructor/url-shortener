@@ -1,5 +1,4 @@
-"""
-test_shorten.py — Tests for POST /shorten endpoint.
+""" test_shorten.py — Tests for POST /shorten endpoint.
 """
 
 import pytest

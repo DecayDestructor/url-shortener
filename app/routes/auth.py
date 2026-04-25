@@ -78,7 +78,7 @@ def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-# Seed admin (one-time utility) 
+# Seed admin 
 @router.post("/admin/seed", include_in_schema=False)
 def seed_admin(session: Session = Depends(get_session)):
     """

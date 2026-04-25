@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // ── Docker Hub username and existing repo names ──
+        //Docker Hub username and existing repo names 
         DOCKERHUB_USER  = "vriva"
         BACKEND_IMAGE   = "${DOCKERHUB_USER}/url-shortener-backend"
         FRONTEND_IMAGE  = "${DOCKERHUB_USER}/url-shortener-frontend"
@@ -14,19 +14,13 @@ pipeline {
     }
 
     stages {
-
-        // ─────────────────────────────────────────────
         // STAGE 1: Pull latest code from GitHub
-        // ─────────────────────────────────────────────
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-
-        // ─────────────────────────────────────────────
         // STAGE 2: Install Python deps for testing
-        // ─────────────────────────────────────────────
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -35,10 +29,7 @@ pipeline {
                 '''
             }
         }
-
-        // ─────────────────────────────────────────────
         // STAGE 3: Run all 85 pytest tests (mocked DB & Redis)
-        // ─────────────────────────────────────────────
         stage('Run Tests') {
             steps {
                 sh '''
@@ -53,10 +44,8 @@ pipeline {
             }
         }
 
-        // ─────────────────────────────────────────────
         // STAGE 4: Build Docker images & push to Docker Hub
         // Credential ID: 'dockerhub-creds' (set up in Jenkins)
-        // ─────────────────────────────────────────────
         stage('Build & Push Docker Images') {
             steps {
                 withCredentials([usernamePassword(
@@ -93,11 +82,8 @@ pipeline {
                 }
             }
         }
-
-        // ─────────────────────────────────────────────
         // STAGE 5: SSH into AWS EC2 and redeploy live app
         // Credential ID: 'ec2-ssh-key' (set up in Jenkins)
-        // ─────────────────────────────────────────────
         stage('Deploy to EC2') {
             steps {
                 withCredentials([sshUserPrivateKey(

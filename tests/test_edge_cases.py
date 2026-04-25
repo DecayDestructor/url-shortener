@@ -1,6 +1,4 @@
-"""
-test_edge_cases.py — Cross-cutting edge case and integration-style tests.
-
+""" test_edge_cases.py — Cross-cutting edge case and integration-style tests.
 Covers: invalid inputs, URL management endpoints, trending, admin access.
 """
 
