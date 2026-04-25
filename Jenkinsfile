@@ -107,8 +107,9 @@ pipeline {
                     sh '''
                     echo "Deploying to EC2 at ${EC2_HOST}..."
                     ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" ${EC2_USER}@${EC2_HOST} "
-                        docker compose -f ~/docker-compose.prod.yml pull &&
-                        docker compose -f ~/docker-compose.prod.yml up -d --force-recreate --remove-orphans
+                        docker-compose -f ~/docker-compose.prod.yml pull &&
+                        docker-compose -f ~/docker-compose.prod.yml down &&
+                        docker-compose -f ~/docker-compose.prod.yml up -d --remove-orphans
                     "
                     echo "Deployment complete! App is live at http://${EC2_HOST}"
                     '''
