@@ -1,0 +1,60 @@
+# docker-compose.prod.yml  ← Lives on the EC2 server (NOT in your repo)
+# This file uses pre-built images from Docker Hub instead of building locally.
+# Jenkins pulls these images and restarts your containers automatically!
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: snip_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - snip_network
+
+  backend:
+    image: vriva/url-shortener-backend:latest   # ← Pulled from Docker Hub
+    container_name: snip_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env                             # ← Your real .env lives on EC2
+    environment:
+      REDIS_URL: redis://redis:6379
+      BASE_URL: http://3.81.31.34
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - snip_network
+
+  frontend:
+    image: vriva/url-shortener-frontend:latest  # ← Pulled from Docker Hub
+    container_name: snip_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - snip_network
+
+volumes:
+  redis_data:
+
+networks:
+  snip_network:
+    driver: bridge
