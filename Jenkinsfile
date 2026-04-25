@@ -30,7 +30,10 @@ pipeline {
         stage('Run Tests') {
             steps {
                 // Run tests with verbose output
+                // Create a dummy .env file so pydantic-settings doesn't fail on missing DATABASE_URL
                 sh '''
+                echo "Creating dummy .env for tests..."
+                cp .env.example .env
                 echo "Running unit tests..."
                 pytest -v
                 '''
