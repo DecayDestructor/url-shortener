@@ -199,7 +199,7 @@ function HeroSection() {
             <span style={{ WebkitTextStroke: "3px #0a0a0a", color: "#FFE500" }}>Big impact.</span>
           </h1>
           <p className="text-lg font-medium max-w-xl mx-auto mb-10" style={{ color: "#444" }}>
-            Transform any URL into a powerful,short link with QR codes, custom aliases, and real-time analytics.
+            Transform any URL into a powerful, tracable,short link with QR codes, custom aliases, and real-time analytics.
           </p>
 
           {!isLoggedIn && (
