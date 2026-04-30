@@ -7,6 +7,7 @@ import os
 from app.routes.url import router as url_router
 from app.routes.auth import router as auth_router
 from app.db.database import create_db_and_tables, engine
+from app.db import models  # noqa: F401 — ensures all tables are registered with SQLModel metadata
 from app.tasks.click_sync import sync_all_clicks_to_db
 from sqlmodel import Session, select
 from sqlalchemy import func
