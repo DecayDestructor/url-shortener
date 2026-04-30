@@ -57,7 +57,7 @@ pipeline {
                   -v url-shortener_jenkins_home:/var/jenkins_home \
                   -w "${PWD}" \
                   docker:cli \
-                  docker compose -f docker-compose.cloud.yml up -d --build backend frontend
+                  docker compose -p url-shortener -f docker-compose.yml up -d --build backend frontend
                 '''
             }
         }
