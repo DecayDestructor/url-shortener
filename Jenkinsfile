@@ -18,7 +18,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Running tests inside Python Docker container..."
-                docker run --rm -v ${PWD}:/app -w /app python:3.12-slim bash -c "
+                docker run --rm -v jenkins_home:/var/jenkins_home -w "${PWD}" python:3.12-slim bash -c "
                     pip install --no-cache-dir -r requirements.txt &&
                     echo 'DATABASE_URL=sqlite://' > .env &&
                     echo 'REDIS_URL=redis://localhost:6379' >> .env &&
@@ -38,7 +38,8 @@ pipeline {
                   -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
                   -e SONAR_LOGIN="${SONAR_LOGIN}" \
                   -e SONAR_PASSWORD="${SONAR_PASSWORD}" \
-                  -v "${PWD}:/usr/src" \
+                  -v jenkins_home:/var/jenkins_home \
+                  -w "${PWD}" \
                   sonarsource/sonar-scanner-cli \
                   -Dsonar.projectKey=url-shortener \
                   -Dsonar.projectName="Snip.ly URL Shortener" \
