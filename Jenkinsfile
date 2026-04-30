@@ -9,7 +9,7 @@ pipeline {
         IMAGE_TAG       = "${env.BUILD_ID}"
 
         // ── EC2 server details ──
-        EC2_HOST        = "3.81.31.34"
+        EC2_HOST        = "54.91.164.129"
         EC2_USER        = "ubuntu"
     }
 

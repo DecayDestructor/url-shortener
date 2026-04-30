@@ -1,1 +1,2 @@
-BASE_URL = "http://3.81.31.34"
+import os
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
