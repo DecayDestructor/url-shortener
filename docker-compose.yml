@@ -30,7 +30,7 @@ services:
     environment:
       # Override Redis URL to point at the redis service in Docker network
       REDIS_URL: redis://redis:6379
-      BASE_URL: http://3.81.31.34
+      BASE_URL: http://54.91.164.129
     depends_on:
       redis:
         condition: service_healthy
