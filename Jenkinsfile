@@ -52,8 +52,6 @@ pipeline {
             steps {
                 sh '''
                 echo "Rebuilding and Deploying containers live..."
-                # Copy the real server .env (with proper DB URL) before deploying
-                cp /opt/URL-shortener/.env "${PWD}/.env"
                 docker run --rm \
                   -v /var/run/docker.sock:/var/run/docker.sock \
                   -v url-shortener_jenkins_home:/var/jenkins_home \
