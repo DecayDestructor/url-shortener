@@ -4,7 +4,7 @@ pipeline {
     environment {
         SONAR_HOST_URL = "http://54.91.164.129:9000"
         SONAR_LOGIN    = "admin"
-        SONAR_PASSWORD = "admin123"
+        SONAR_PASSWORD = "aaryan"
     }
 
     stages {
