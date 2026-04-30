@@ -17,3 +17,7 @@ def create_db_and_tables():
 def get_session():
     with Session(engine) as session:
         yield session
+
+
+
+admin_password = "super_secret_database_password_123"
