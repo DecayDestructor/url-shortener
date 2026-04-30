@@ -52,9 +52,12 @@ pipeline {
             steps {
                 sh '''
                 echo "Rebuilding and Deploying containers live..."
-                # Since Jenkins is on the same server, we can just trigger Docker Compose!
-                docker compose -f docker-compose.cloud.yml build backend frontend
-                docker compose -f docker-compose.cloud.yml up -d backend frontend
+                docker run --rm \
+                  -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v url-shortener_jenkins_home:/var/jenkins_home \
+                  -w "${PWD}" \
+                  docker:cli \
+                  docker compose -f docker-compose.cloud.yml up -d --build backend frontend
                 '''
             }
         }
