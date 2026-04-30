@@ -35,12 +35,12 @@ pipeline {
                 sh '''
                 echo "Running SonarQube Scanner..."
                 docker run --rm --network host \
-                  -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-                  -e SONAR_LOGIN="${SONAR_LOGIN}" \
-                  -e SONAR_PASSWORD="${SONAR_PASSWORD}" \
                   -v url-shortener_jenkins_home:/var/jenkins_home \
                   -w "${PWD}" \
                   sonarsource/sonar-scanner-cli \
+                  -Dsonar.host.url="${SONAR_HOST_URL}" \
+                  -Dsonar.login="${SONAR_LOGIN}" \
+                  -Dsonar.password="${SONAR_PASSWORD}" \
                   -Dsonar.projectKey=url-shortener \
                   -Dsonar.projectName="Snip.ly URL Shortener" \
                   -Dsonar.sources=.
