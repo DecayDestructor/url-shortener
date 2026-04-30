@@ -195,7 +195,7 @@ function HeroSection() {
             🔗 URL Shortener &amp; Analytics
           </div>
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-tight mb-6" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
-            Short links.<br />
+            MY URL SHORTENER<br />
             <span style={{ WebkitTextStroke: "3px #0a0a0a", color: "#FFE500" }}>Big impact.</span>
           </h1>
           <p className="text-lg font-medium max-w-xl mx-auto mb-10" style={{ color: "#444" }}>
